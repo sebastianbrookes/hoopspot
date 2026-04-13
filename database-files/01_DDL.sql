@@ -3,7 +3,7 @@ CREATE DATABASE HoopSpot;
 USE HoopSpot;
 
 CREATE TABLE Neighborhood (
-    NeighborhoodId INT PRIMARY KEY,
+    NeighborhoodId INT AUTO_INCREMENT PRIMARY KEY,
     NeighborhoodName VARCHAR(100) NOT NULL,
     City VARCHAR(100) NOT NULL,
     State VARCHAR(50) NOT NULL,
@@ -11,12 +11,12 @@ CREATE TABLE Neighborhood (
 );
 
 CREATE TABLE Amenity (
-    AmenityId INT PRIMARY KEY,
+    AmenityId INT AUTO_INCREMENT PRIMARY KEY,
     AmenityName VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Player (
-    PlayerId INT PRIMARY KEY,
+    PlayerId INT AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(50) NOT NULL,
     Email VARCHAR(255) NOT NULL UNIQUE,
     SkillRating DECIMAL(3,1) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE Player (
 );
 
 CREATE TABLE Court (
-    CourtId INT PRIMARY KEY,
+    CourtId INT AUTO_INCREMENT PRIMARY KEY,
     CourtName VARCHAR(100) NOT NULL,
     Address VARCHAR(255) NOT NULL,
     Latitude DECIMAL(9,6) NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE CourtAmenity (
 );
 
 CREATE TABLE CheckIn (
-    CheckInId INT PRIMARY KEY,
+    CheckInId INT AUTO_INCREMENT PRIMARY KEY,
     CheckInTime DATETIME NOT NULL,
     CheckOutTime DATETIME NULL,
     PlayerId INT NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE CheckIn (
 );
 
 CREATE TABLE CourtReview (
-    ReviewId INT PRIMARY KEY,
+    ReviewId INT AUTO_INCREMENT PRIMARY KEY,
     Rating DECIMAL(2,1) NOT NULL,
     ConditionRating DECIMAL(2,1) NOT NULL,
     Comment TEXT,
@@ -88,7 +88,7 @@ CREATE TABLE CourtReview (
 );
 
 CREATE TABLE Game (
-    GameId INT PRIMARY KEY,
+    GameId INT AUTO_INCREMENT PRIMARY KEY,
     GameDate DATETIME NOT NULL,
     GameType VARCHAR(50) NOT NULL,
     MinSkillRating DECIMAL(3,1) NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE GameParticipation (
 );
 
 CREATE TABLE Tournament (
-    TournamentId INT PRIMARY KEY,
+    TournamentId INT AUTO_INCREMENT PRIMARY KEY,
     TournamentName VARCHAR(100) NOT NULL,
     StartDate DATE NOT NULL,
     EndDate DATE NOT NULL,
@@ -133,7 +133,7 @@ CREATE TABLE TournamentRegistration (
 );
 
 CREATE TABLE TournamentMatch (
-    MatchId INT PRIMARY KEY,
+    MatchId INT AUTO_INCREMENT PRIMARY KEY,
     RoundNumber INT NOT NULL,
     MatchOrder INT NOT NULL,
     MatchStatus VARCHAR(30) NOT NULL,
