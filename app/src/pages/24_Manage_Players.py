@@ -12,7 +12,41 @@ SideBarLinks(show_home=True)
 
 BASE_URL = "http://web-api:4000"
 
+
+@st.dialog("Confirm Deactivation")
+def _deactivation_confirm_dialog():
+    pid = st.session_state.get("_deactivate_pid")
+    username = st.session_state.get("_deactivate_username", "this player")
+    st.write(f"Are you sure you want to deactivate **{username}**?")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Cancel", use_container_width=True):
+            st.session_state.pop("_deactivate_pid", None)
+            st.session_state.pop("_deactivate_username", None)
+            st.rerun()
+    with col2:
+        if st.button("Confirm", type="primary", use_container_width=True):
+            try:
+                resp = requests.put(
+                    f"{BASE_URL}/player/players/{pid}",
+                    json={"IsActive": False},
+                    timeout=5,
+                )
+                if resp.status_code == 200:
+                    st.session_state.pop("_deactivate_pid", None)
+                    st.session_state.pop("_deactivate_username", None)
+                    st.toast(f"'{username}' deactivated.")
+                    st.rerun()
+                else:
+                    st.error(f"Error: {resp.text}")
+            except Exception as e:
+                st.error(f"Could not reach API: {e}")
+
+
 st.markdown("## Player Management")
+
+if "_deactivate_pid" in st.session_state:
+    _deactivation_confirm_dialog()
 
 search = st.text_input("", placeholder="Search by username or email", label_visibility="collapsed")
 
@@ -58,19 +92,24 @@ if players:
 
         with row[4]:
             if st.button(toggle_label, key=f"toggle_{pid}", use_container_width=True):
-                try:
-                    resp = requests.put(
-                        f"{BASE_URL}/player/players/{pid}",
-                        json={"IsActive": new_status},
-                        timeout=5,
-                    )
-                    if resp.status_code == 200:
-                        st.toast(f"'{username}' updated.")
-                        st.rerun()
-                    else:
-                        st.error(f"Error: {resp.text}")
-                except Exception as e:
-                    st.error(f"Could not reach API: {e}")
+                if is_active:
+                    st.session_state["_deactivate_pid"] = pid
+                    st.session_state["_deactivate_username"] = username
+                    st.rerun()
+                else:
+                    try:
+                        resp = requests.put(
+                            f"{BASE_URL}/player/players/{pid}",
+                            json={"IsActive": True},
+                            timeout=5,
+                        )
+                        if resp.status_code == 200:
+                            st.toast(f"'{username}' updated.")
+                            st.rerun()
+                        else:
+                            st.error(f"Error: {resp.text}")
+                    except Exception as e:
+                        st.error(f"Could not reach API: {e}")
 
         st.divider()
 else:
