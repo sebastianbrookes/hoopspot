@@ -54,7 +54,7 @@ if not courts:
     st.stop()
 
 court_names = [c.get("CourtName", "Unknown") for c in courts]
-court_ids = {c.get("CourtName"): c.get("CourtId") for c in courts}
+court_ids = {c.get("CourtName", "Unknown"): c.get("CourtId") for c in courts}
 
 tab_browse, tab_log = st.tabs(["Browse Recent Games", "Log a New Game"])
 
@@ -80,6 +80,9 @@ with tab_browse:
                     st.write(g.get("GameType", "Pickup"))
 
 with tab_log:
+    if st.session_state.get("_game_logged"):
+        st.success(st.session_state.pop("_game_logged"))
+
     with st.form("log_game_form"):
         st.markdown("**Game Details**")
         col1, col2 = st.columns(2)
@@ -92,7 +95,7 @@ with tab_log:
 
         st.markdown("**Your Result**")
         result = st.selectbox("Result", ["Win", "Loss"])
-        score = st.number_input("Your Score (points)", min_value=0, step=1, value=0)
+        points = st.number_input("Points Scored", min_value=0, step=1, value=0)
         submitted = st.form_submit_button("Log Game", type="primary", use_container_width=True)
 
     if submitted:
@@ -101,12 +104,12 @@ with tab_log:
             "GameDate": str(game_date),
             "GameType": game_type,
             "MinSkillRating": min_rating,
-            "players": [{"PlayerId": player_id, "Result": result, "Score": score}],
+            "players": [{"PlayerId": player_id, "Result": result, "Score": points}],
         }
         try:
             resp = requests.post(f"{API_BASE}/tournament/games", json=payload, timeout=5)
             if resp.status_code == 201:
-                st.success(f"Game logged: {result}, {score} pts!")
+                st.session_state["_game_logged"] = f"Game logged! {result} — {points} pts at {log_court}"
                 st.rerun()
             else:
                 st.error(f"Error: {resp.text}")
