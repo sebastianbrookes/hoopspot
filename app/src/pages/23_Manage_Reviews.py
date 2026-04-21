@@ -13,7 +13,34 @@ SideBarLinks(show_home=True)
 BASE_URL = "http://web-api:4000"
 
 
+@st.dialog("Confirm Deletion")
+def _delete_review_confirm_dialog():
+    rid = st.session_state.get("_delete_review_id")
+    st.write("Are you sure you want to delete this review?")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Cancel", use_container_width=True):
+            st.session_state.pop("_delete_review_id", None)
+            st.rerun()
+    with col2:
+        if st.button("Confirm", type="primary", use_container_width=True):
+            try:
+                resp = requests.delete(f"{BASE_URL}/court/reviews/{rid}", timeout=5)
+                if resp.status_code == 200:
+                    st.session_state.pop("_delete_review_id", None)
+                    st.toast("Review removed.")
+                    st.rerun()
+                else:
+                    st.error(f"Error: {resp.text}")
+            except Exception as e:
+                st.error(f"Could not reach API: {e}")
+
+
 # ── Load flagged content ─────────────────────────────────────────────────────
+if "_delete_review_id" in st.session_state:
+    _delete_review_confirm_dialog()
+
+
 def fetch(endpoint):
     try:
         r = requests.get(f"{BASE_URL}{endpoint}", timeout=5)
@@ -80,17 +107,8 @@ with tab1:
                     # DELETE /court/reviews/{id} — removes the flagged review
                     if st.button("Remove", key=f"remove_review_{rid}",
                                  type="primary", use_container_width=True):
-                        try:
-                            resp = requests.delete(
-                                f"{BASE_URL}/court/reviews/{rid}", timeout=5
-                            )
-                            if resp.status_code == 200:
-                                st.toast("Review removed.")
-                                st.rerun()
-                            else:
-                                st.error(f"Error: {resp.text}")
-                        except Exception as e:
-                            st.error(f"Could not reach API: {e}")
+                        st.session_state["_delete_review_id"] = rid
+                        st.rerun()
 
 # ── Tab 2: Flagged Users ──────────────────────────────────────────────────────
 with tab2:
