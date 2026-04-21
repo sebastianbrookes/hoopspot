@@ -118,17 +118,40 @@ if peak_data:
  
     day_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     df_pivot = df_peak.groupby(["HourOfDay", "DayOfWeek"])["CheckInCount"].sum().reset_index()
-    df_pivot = df_pivot.pivot(index="HourOfDay", columns="DayOfWeek", values="CheckInCount").fillna(0)
+    df_pivot = df_pivot.pivot(index="HourOfDay", columns="DayOfWeek", values="CheckInCount").fillna(0).astype(int)
+    df_pivot.columns.name = None
     existing_days = [d for d in day_order if d in df_pivot.columns]
     df_pivot = df_pivot[existing_days]
- 
+
+    hour_labels = {h: f"{h % 12 or 12} {'AM' if h < 12 else 'PM'}" for h in range(24)}
+    df_pivot.index = df_pivot.index.map(lambda h: hour_labels.get(h, str(h)))
+
+    _max = int(df_pivot.values.max()) if df_pivot.values.max() > 0 else 1
+
+    def _cell_style(val):
+        if val == 0:
+            return "background-color: transparent; color: transparent;"
+        intensity = val / _max
+        r = int(254 - 100 * intensity)
+        g = int(215 - 163 * intensity)
+        b = int(170 - 152 * intensity)
+        text_color = "#1E293B" if intensity < 0.55 else "#F1F5F9"
+        return f"background-color: rgb({r},{g},{b}); color: {text_color}; font-weight: 600;"
+
+    styled = (
+        df_pivot.style
+        .map(_cell_style)
+        .format(lambda x: "" if x == 0 else str(x))
+    )
+
     st.markdown("**Check-ins by Hour and Day of Week**")
-    st.dataframe(df_pivot.style.background_gradient(cmap="Oranges"), use_container_width=True)
+    st.dataframe(styled, use_container_width=True)
  
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown('<div class="section-title">Busiest Hours Overall</div>', unsafe_allow_html=True)
     df_hour = df_peak.groupby("HourOfDay")["CheckInCount"].sum().reset_index()
     df_hour.columns = ["Hour", "CheckIns"]
+    df_hour["Hour"] = df_hour["Hour"].map(lambda h: hour_labels.get(h, str(h)))
     st.bar_chart(df_hour.set_index("Hour")["CheckIns"], use_container_width=True, height=250)
 else:
     st.info("No peak hours data available.")
