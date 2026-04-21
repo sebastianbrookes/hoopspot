@@ -71,7 +71,7 @@ if "_deactivate_id" in st.session_state:
 # ── Top bar: search + add button ────────────────────────────────────────────
 top_left, top_right = st.columns([4, 1])
 with top_left:
-    search = st.text_input("", placeholder="🔍 Search Court", label_visibility="collapsed")
+    search = st.text_input("Search", placeholder="🔍 Search Court", label_visibility="collapsed")
 with top_right:
     add_court = st.button("+ Add Court", type="primary", use_container_width=True)
 
