@@ -32,7 +32,41 @@ NEIGHBORHOODS = {
 }
 NEIGHBORHOOD_OPTIONS = [f"{nid} - {name}" for nid, name in NEIGHBORHOODS.items()]
 
+
+@st.dialog("Confirm Deactivation")
+def _deactivation_confirm_dialog():
+    court_id = st.session_state.get("_deactivate_id")
+    name = st.session_state.get("_deactivate_name", "this court")
+    st.write(f"Are you sure you want to deactivate **{name}**?")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Cancel", use_container_width=True):
+            st.session_state.pop("_deactivate_id", None)
+            st.session_state.pop("_deactivate_name", None)
+            st.rerun()
+    with col2:
+        if st.button("Confirm", type="primary", use_container_width=True):
+            try:
+                resp = requests.put(
+                    f"{BASE_URL}/court/courts/{court_id}",
+                    json={"IsActive": False},
+                    timeout=5,
+                )
+                if resp.status_code == 200:
+                    st.session_state.pop("_deactivate_id", None)
+                    st.session_state.pop("_deactivate_name", None)
+                    st.toast(f"'{name}' deactivated.")
+                    st.rerun()
+                else:
+                    st.error(f"Error: {resp.text}")
+            except Exception as e:
+                st.error(f"Could not reach API: {e}")
+
+
 st.markdown("## Court Management")
+
+if "_deactivate_id" in st.session_state:
+    _deactivation_confirm_dialog()
 
 # ── Top bar: search + add button ────────────────────────────────────────────
 top_left, top_right = st.columns([4, 1])
@@ -147,20 +181,24 @@ if courts:
 
         with row[4]:
             if st.button(action_label, key=f"action_{court_id}", use_container_width=True):
-                try:
-                    # PUT /court/courts/{id} with IsActive toggle
-                    resp = requests.put(
-                        f"{BASE_URL}/court/courts/{court_id}",
-                        json={"IsActive": new_status},
-                        timeout=5,
-                    )
-                    if resp.status_code == 200:
-                        st.toast(f"'{name}' updated.")
-                        st.rerun()
-                    else:
-                        st.error(f"Error: {resp.text}")
-                except Exception as e:
-                    st.error(f"Could not reach API: {e}")
+                if is_active:
+                    st.session_state["_deactivate_id"] = court_id
+                    st.session_state["_deactivate_name"] = name
+                    st.rerun()
+                else:
+                    try:
+                        resp = requests.put(
+                            f"{BASE_URL}/court/courts/{court_id}",
+                            json={"IsActive": True},
+                            timeout=5,
+                        )
+                        if resp.status_code == 200:
+                            st.toast(f"'{name}' updated.")
+                            st.rerun()
+                        else:
+                            st.error(f"Error: {resp.text}")
+                    except Exception as e:
+                        st.error(f"Could not reach API: {e}")
         st.divider()
 else:
     st.info("No courts found.")
