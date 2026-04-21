@@ -7,6 +7,51 @@ import streamlit as st
 # ---- General ----------------------------------------------------------------
 
 
+def sidebar_brand():
+    st.sidebar.markdown(
+        """
+        <div style="padding: 0.25rem 0 1rem 0;">
+            <div style="
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                padding:0.8rem;
+                border-radius:16px;
+                background:linear-gradient(180deg, rgba(15,23,42,0.92), rgba(15,23,42,0.72));
+                border:1px solid rgba(148,163,184,0.12);
+            ">
+                <div style="
+                    width:44px;
+                    height:44px;
+                    border-radius:14px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    background:linear-gradient(135deg, rgba(249,115,22,0.18), rgba(234,88,12,0.28));
+                    border:1px solid rgba(249,115,22,0.28);
+                    flex-shrink:0;
+                ">
+                    <svg width="28" height="28" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1.5" y="1.5" width="49" height="49" rx="14" fill="#111827" stroke="#FB923C" stroke-width="1.5"/>
+                        <circle cx="26" cy="20" r="11" stroke="#F97316" stroke-width="2.5"/>
+                        <path d="M15 20H37" stroke="#F97316" stroke-width="2"/>
+                        <path d="M26 9V31" stroke="#F97316" stroke-width="2"/>
+                        <path d="M18.5 12.5C23.5 16 28.5 24 33.5 27.5" stroke="#F97316" stroke-width="2"/>
+                        <path d="M16 35H36" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M18 35L20 41" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M22 35L23.5 42" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M26 35V42" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M30 35L28.5 42" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M34 35L32 41" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def home_nav():
     st.sidebar.page_link("Home.py", label="Home", icon="🏠")
 
@@ -99,6 +144,8 @@ def SideBarLinks(show_home=False):
     Renders sidebar navigation links based on the logged-in user's role.
     The role is stored in st.session_state when the user logs in on Home.py.
     """
+
+    sidebar_brand()
 
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
