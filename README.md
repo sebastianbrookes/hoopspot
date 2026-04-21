@@ -10,7 +10,7 @@ The app is organized around four user personas, each with a dedicated set of pag
 
 - **Marcus Reyes — Pickup Player.** Finds open courts, checks in to games, and manages a personal profile.
 - **Aaliyah — Competitive Player.** Tracks leaderboards, joins tournaments, and follows competitive stats.
-- **Devon Williams — System Administrator.** Manages courts, reviews, and ML model configuration.
+- **Devon Williams — System Administrator.** Manages courts, reviews, and players.
 - **Priya Nair — Parks and Rec Data Analyst.** Explores usage dashboards and heat maps, compares condition ratings against activity, and exports filtered data for city reporting.
 
 ### Architecture
@@ -28,8 +28,7 @@ HoopSpot runs as three containerized services orchestrated by Docker Compose:
 - `./app` — Streamlit frontend
 - `./api` — Flask REST API
 - `./database-files` — SQL scripts that initialize the MySQL database
-- `./datasets` — sample data used for analysis and ML
-- `./ml-src` — ML model development (notebooks, training scripts)
+- `./datasets` — sample data used for analysis
 - `./docs` — additional project documentation
 - `docker-compose.yaml` — service definitions for the full stack
 
